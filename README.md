@@ -1,36 +1,130 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CandiPilot 🚀
 
-## Getting Started
+SaaS B2C de suivi de candidatures de stages pour étudiants français.
 
-First, run the development server:
+## Stack
+
+- **Next.js 15** (App Router)
+- **Supabase** (Auth + Postgres + RLS)
+- **shadcn/ui** + Tailwind CSS
+- **Stripe** (Paiements)
+- **Google Gemini** (IA)
+
+## Fonctionnalités
+
+- ✅ Kanban 6 colonnes avec drag & drop
+- ✅ Auto-fill depuis URL d'offres
+- ✅ Relances IA personnalisées
+- ✅ Freemium (20 candidatures gratuites)
+- ✅ Mobile responsive
+
+## Installation
+
+### 1. Cloner et installer
+
+```bash
+git clone <votre-repo>
+cd CandiPilot
+npm install
+```
+
+### 2. Configurer Supabase
+
+1. Créer un projet sur [supabase.com](https://supabase.com)
+2. Aller dans **SQL Editor** et exécuter le contenu de `supabase/schema.sql`
+3. Copier les clés depuis **Settings > API**
+
+### 3. Configurer les variables d'environnement
+
+Renommer `env.example.txt` en `.env.local` et remplir :
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
+GEMINI_API_KEY=AIza...
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PRICE_ID=price_...
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 4. Configurer Stripe (optionnel)
+
+1. Créer un produit "CandiPilot Pro" à 5.99€/mois
+2. Copier le Price ID
+3. Configurer le webhook vers `/api/stripe/webhook`
+
+### 5. Lancer en développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvrir [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Déploiement Vercel
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Méthode 1 : CLI
 
-## Learn More
+```bash
+npm install -g vercel
+vercel
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Méthode 2 : GitHub
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Push votre code sur GitHub
+2. Connecter le repo sur [vercel.com](https://vercel.com)
+3. Ajouter les variables d'environnement
+4. Déployer
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Variables à configurer sur Vercel
 
-## Deploy on Vercel
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `GEMINI_API_KEY`
+- `STRIPE_SECRET_KEY`
+- `STRIPE_WEBHOOK_SECRET`
+- `NEXT_PUBLIC_STRIPE_PRICE_ID`
+- `NEXT_PUBLIC_APP_URL` (votre domaine Vercel)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+src/
+├── app/
+│   ├── page.tsx              # Landing + Auth
+│   ├── dashboard/page.tsx    # Kanban + Stats
+│   ├── new/page.tsx          # Nouvelle candidature
+│   ├── app/[id]/page.tsx     # Détail candidature
+│   ├── billing/page.tsx      # Stripe checkout
+│   └── api/
+│       ├── applications/count/
+│       ├── fetch-metadata/
+│       ├── ai/followup/
+│       └── stripe/checkout|webhook/
+├── components/
+│   ├── ui/                   # shadcn components
+│   ├── auth-form.tsx
+│   ├── kanban-board.tsx
+│   ├── application-*.tsx
+│   └── ...
+└── lib/
+    ├── supabase/             # Clients Supabase
+    ├── constants.ts
+    ├── types.ts
+    └── utils.ts
+```
+
+## Limites Freemium
+
+- **Free** : 20 candidatures
+- **Pro** : Illimité (5.99€/mois)
+
+Modifier dans `src/lib/constants.ts`.
+
+## Licence
+
+MIT © 2024

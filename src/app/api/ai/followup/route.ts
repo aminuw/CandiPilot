@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
 export async function POST(request: NextRequest) {
     try {
@@ -12,14 +12,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (!process.env.GEMINI_API_KEY) {
+        if (!process.env.GROQ_API_KEY) {
             return NextResponse.json(
-                { error: "Gemini API key not configured" },
+                { error: "Groq API key not configured" },
                 { status: 500 }
             );
         }
 
-        const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const groq = new Groq({
+            apiKey: process.env.GROQ_API_KEY,
+        });
 
         const appliedDate = appliedAt
             ? new Date(appliedAt).toLocaleDateString("fr-FR", {
@@ -47,10 +49,19 @@ Règles :
 
 Réponds uniquement avec l'email, sans commentaires.`;
 
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const email = response.text();
+        const chatCompletion = await groq.chat.completions.create({
+            messages: [
+                {
+                    role: "user",
+                    content: prompt,
+                }
+            ],
+            model: "llama-3.3-70b-versatile",
+            temperature: 0.7,
+            max_tokens: 500,
+        });
+
+        const email = chatCompletion.choices[0]?.message?.content || "";
 
         return NextResponse.json({ email });
     } catch (error) {

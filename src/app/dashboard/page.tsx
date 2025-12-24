@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Navbar } from "@/components/navbar";
 import { KanbanBoard } from "@/components/kanban-board";
 import { StatsOverview, StatusBreakdown } from "@/components/stats-overview";
+import { ExportCSVButton } from "@/components/export-csv-button";
 import { Button } from "@/components/ui/button";
 import { Application, User } from "@/lib/types";
 import { MAX_FREE_APPLICATIONS } from "@/lib/constants";
@@ -68,6 +69,7 @@ export default async function DashboardPage() {
                                     : "Limite atteinte"}
                             </span>
                         )}
+                        <ExportCSVButton isPro={user.subscription_status === "pro"} />
                         <Link href="/new">
                             <Button>
                                 <Plus className="h-4 w-4 mr-2" />

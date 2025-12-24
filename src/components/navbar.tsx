@@ -4,8 +4,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
-import { LogOut, Plus, Rocket, CreditCard } from "lucide-react";
+import { LogOut, Plus, Rocket, CreditCard, Crown, HelpCircle } from "lucide-react";
 import { User } from "@/lib/types";
+import { SupportDialog } from "./support-dialog";
 
 interface NavbarProps {
     user: User | null;
@@ -29,6 +30,12 @@ export function Navbar({ user }: NavbarProps) {
                     <span className="font-bold text-lg bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
                         CandiPilot
                     </span>
+                    {/* Feature 1: Badge Pro */}
+                    {user?.subscription_status === "pro" && (
+                        <span className="ml-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 text-white">
+                            Pro
+                        </span>
+                    )}
                 </Link>
 
                 {user && (
@@ -44,11 +51,14 @@ export function Navbar({ user }: NavbarProps) {
                         {user.subscription_status === "free" && (
                             <Link href="/billing">
                                 <Button variant="outline" size="sm" className="text-amber-400 border-amber-500/30 hover:bg-amber-500/10">
-                                    <CreditCard className="h-4 w-4 mr-1" />
+                                    <Crown className="h-4 w-4 mr-1" />
                                     <span className="hidden sm:inline">Pro</span>
                                 </Button>
                             </Link>
                         )}
+
+                        {/* Feature 2: Support Button */}
+                        <SupportDialog userEmail={user.email} />
 
                         <Button variant="ghost" size="sm" onClick={handleLogout}>
                             <LogOut className="h-4 w-4" />

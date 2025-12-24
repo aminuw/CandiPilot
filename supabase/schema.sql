@@ -10,6 +10,8 @@ CREATE TABLE public.users (
   email TEXT UNIQUE NOT NULL,
   subscription_status TEXT DEFAULT 'free' CHECK (subscription_status IN ('free', 'pro')),
   stripe_customer_id TEXT,
+  ai_followups_count INTEGER DEFAULT 0,
+  ai_followups_reset_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

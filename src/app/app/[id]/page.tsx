@@ -94,7 +94,7 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
                     <NotesEditor applicationId={app.id} initialNotes={app.notes} />
 
                     {/* AI Followup */}
-                    <AIFollowup application={app} />
+                    <AIFollowup application={app} isPro={user.subscription_status === "pro"} />
 
                     {/* Danger zone */}
                     <div className="p-4 bg-red-500/5 border border-red-500/20 rounded-xl">

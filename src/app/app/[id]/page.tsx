@@ -16,7 +16,7 @@ import {
 import { APPLICATION_STATUSES, type ApplicationStatus } from "@/lib/constants";
 import { Application, User } from "@/lib/types";
 import { ArrowLeft, Trash2 } from "lucide-react";
-import { DeleteButton, StatusSelect } from "./client-components";
+import { DeleteButton, StatusSelect, NotesEditor } from "./client-components";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -89,6 +89,9 @@ export default async function ApplicationDetailPage({ params }: PageProps) {
                         </div>
                         <StatusSelect applicationId={app.id} currentStatus={app.status} />
                     </div>
+
+                    {/* Notes Editor */}
+                    <NotesEditor applicationId={app.id} initialNotes={app.notes} />
 
                     {/* AI Followup */}
                     <AIFollowup application={app} />

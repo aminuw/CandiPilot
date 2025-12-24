@@ -12,7 +12,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { APPLICATION_STATUSES, type ApplicationStatus } from "@/lib/constants";
-import { Loader2, Trash2 } from "lucide-react";
+import { Loader2, Trash2, Check, Save } from "lucide-react";
 
 interface StatusSelectProps {
     applicationId: string;
@@ -100,3 +100,61 @@ export function DeleteButton({ applicationId }: DeleteButtonProps) {
         </Button>
     );
 }
+
+// Feature 1: Notes Editor Component
+interface NotesEditorProps {
+    applicationId: string;
+    initialNotes: string | null | undefined;
+}
+
+export function NotesEditor({ applicationId, initialNotes }: NotesEditorProps) {
+    const router = useRouter();
+    const supabase = createClient();
+    const [notes, setNotes] = useState(initialNotes || "");
+    const [loading, setLoading] = useState(false);
+    const [saved, setSaved] = useState(false);
+
+    const handleSave = async () => {
+        setLoading(true);
+        setSaved(false);
+        try {
+            await supabase
+                .from("applications")
+                .update({ notes })
+                .eq("id", applicationId);
+
+            setSaved(true);
+            setTimeout(() => setSaved(false), 2000);
+            router.refresh();
+        } catch (error) {
+            console.error("Failed to save notes:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="p-4 bg-slate-900/50 rounded-xl border border-slate-800">
+            <h3 className="font-medium text-slate-200 mb-3">Notes</h3>
+            <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Ajoute tes notes sur cette candidature..."
+                className="w-full h-32 px-3 py-2 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-300 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
+            />
+            <div className="flex items-center gap-2 mt-3">
+                <Button onClick={handleSave} disabled={loading} size="sm">
+                    {loading ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    ) : saved ? (
+                        <Check className="h-4 w-4 mr-2" />
+                    ) : (
+                        <Save className="h-4 w-4 mr-2" />
+                    )}
+                    {saved ? "Sauvegardé !" : "Sauvegarder"}
+                </Button>
+            </div>
+        </div>
+    );
+}
+

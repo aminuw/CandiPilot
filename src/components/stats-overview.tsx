@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Application } from "@/lib/types";
 import { APPLICATION_STATUSES } from "@/lib/constants";
-import { TrendingUp, Send, Calendar, Trophy } from "lucide-react";
+import { TrendingUp, Send, Calendar, Trophy, CalendarDays } from "lucide-react";
 
 interface StatsOverviewProps {
     applications: Application[];
@@ -12,6 +12,11 @@ export function StatsOverview({ applications }: StatsOverviewProps) {
     const appliedCount = applications.filter((a) => a.status !== "todo").length;
     const interviewCount = applications.filter((a) => a.status === "interview").length;
     const offerCount = applications.filter((a) => a.status === "offer").length;
+
+    // Feature 2: Calculate applications this week
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const thisWeekCount = applications.filter((a) => new Date(a.created_at) >= oneWeekAgo).length;
 
     // Calculate success rate (offers / applications sent)
     const successRate = appliedCount > 0 ? Math.round((offerCount / appliedCount) * 100) : 0;
@@ -44,6 +49,13 @@ export function StatsOverview({ applications }: StatsOverviewProps) {
             icon: Trophy,
             color: "text-amber-400",
             bg: "bg-amber-500/20",
+        },
+        {
+            label: "Cette semaine",
+            value: thisWeekCount,
+            icon: CalendarDays,
+            color: "text-green-400",
+            bg: "bg-green-500/20",
         },
     ];
 

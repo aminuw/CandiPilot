@@ -1,9 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import Groq from "groq-sdk";
 
+// Feature 3: Tone-specific prompt configurations
+const TONE_PROMPTS = {
+    formal: {
+        style: "très formel et soutenu, utilisant le vouvoiement systématiquement",
+        maxWords: 180,
+    },
+    neutral: {
+        style: "professionnel mais accessible, adapté à un étudiant",
+        maxWords: 150,
+    },
+    short: {
+        style: "très court et direct, allant droit à l'essentiel",
+        maxWords: 80,
+    },
+};
+
 export async function POST(request: NextRequest) {
     try {
-        const { company, role, appliedAt } = await request.json();
+        const { company, role, appliedAt, tone = "neutral" } = await request.json();
 
         if (!company || !role) {
             return NextResponse.json(
@@ -31,21 +47,23 @@ export async function POST(request: NextRequest) {
             })
             : "récemment";
 
+        // Feature 3: Get tone-specific settings
+        const toneConfig = TONE_PROMPTS[tone as keyof typeof TONE_PROMPTS] || TONE_PROMPTS.neutral;
+
         const prompt = `Tu es un assistant carrière français expert en rédaction d'emails professionnels.
 
-Génère un email de relance concis et professionnel pour une candidature de stage avec ces informations :
+Génère un email de relance pour une candidature de stage avec ces informations :
 - Entreprise : ${company}
 - Poste : ${role}
 - Date de candidature : ${appliedDate}
 
 Règles :
-1. Ton professionnel mais pas trop formel (adapté à un étudiant)
-2. Maximum 150 mots
+1. Ton ${toneConfig.style}
+2. Maximum ${toneConfig.maxWords} mots
 3. Montre ta motivation et ta curiosité pour le poste
 4. Demande poliment des nouvelles de ta candidature
-5. Propose de fournir des informations complémentaires
-6. Ne pas être insistant ou désespéré
-7. Format : Objet + Corps de l'email + Signature "[Votre nom]"
+5. Ne pas être insistant ou désespéré
+6. Format : Objet + Corps de l'email + Signature "[Votre nom]"
 
 Réponds uniquement avec l'email, sans commentaires.`;
 
